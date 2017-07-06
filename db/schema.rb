@@ -18,6 +18,7 @@ ActiveRecord::Schema.define(version: 20170701032153) do
   create_table "events", force: :cascade do |t|
     t.string "event_feed_name"
     t.string "name"
+    t.string "url_keyword"
     t.text "description"
     t.text "summary"
     t.string "identifier"

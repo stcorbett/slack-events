@@ -37,6 +37,7 @@ class EventsFeed
         event_feed_name:  "peoplevine",
         feed_response:    peoplevine_event_hash,
         name:             peoplevine_event_hash["event_title"],
+        url_keyword:      peoplevine_event_hash["event_keyword"],
         description:      peoplevine_event_hash["event_description"],
         summary:          peoplevine_event_hash["event_summary"],
         identifier:       peoplevine_event_hash["event_no"],

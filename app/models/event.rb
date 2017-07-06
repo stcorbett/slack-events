@@ -21,6 +21,15 @@ class Event < ApplicationRecord
     write_attribute(:description, strip_html(string))
   end
 
+  # need to do these html replacements before storing open text from peoplevine
+  # Replace the ampersand, &, with &amp;
+  # Replace the less-than sign, < with &lt;
+  # Replace the greater-than sign, > with &gt;
+
+  def people_vine_url
+    "https://mhubchicago.com/event/#{url_keyword}"
+  end
+
   private
     def timestamp_to_event_time_zone(timestamp)
       # Time interprets timestamps as being based in UTC

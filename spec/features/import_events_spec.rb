@@ -6,6 +6,7 @@ feature 'Importing events from EVENTS_URL' do
   let(:feed)          { EventsFeed.new }
 
   before do
+    Event.destroy_all
     response_body = File.read js_response
     allow(feed).to receive(:feed_response) { double("Faraday::Response", body: response_body) }
   end

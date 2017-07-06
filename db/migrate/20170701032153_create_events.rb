@@ -3,6 +3,7 @@ class CreateEvents < ActiveRecord::Migration[5.1]
     create_table :events do |t|
       t.string :event_feed_name
       t.string :name
+      t.string :url_keyword
       t.text :description, :summary
       t.string :identifier
       t.string :venue
