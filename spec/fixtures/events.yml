@@ -1,0 +1,46 @@
+mobility:
+  name: mHUB and New Mobility Lab Information Session with The Autonomous Vehicle
+    Alliance
+  description: |-
+    The Autonomous Vehicle Alliance uniquely focuses on the identification of consumer and customer facing value propositions associated with Level 4 and 5 autonomous vehicles. 
+    Tim Woods, General Manager of the AVA, will be here to share the topline collaborative research being conducted by General Motors, Ford Motor Company, FCA, All State, Cox Automotive, Magna International, Spartan Motors and The Taubman Company. In particular, Tim will review and answer questions from the AVA's Fleet Ecosystem Needs Assessment Research, The Global Longitudinal Consumer Perceptions Study and the recently completed Municipal Research. He will also share upcoming research in development by the AVA and it's significance to the evolving autonomous ecosystem.  
+  summary: Tim Woods, General Manager of the AVA, will visit mHUB to share the topline
+    collaborative research being conducted by General Motors, Ford Motor Company,
+    FCA, All State, Cox Automotive, Magna International, Spartan Motors and The Taubman
+    Company. Tim will review and answer questions from the AVA's Fleet Ecosystem Needs
+    Assessment Research, The Global Longitudinal Consumer Perceptions Study and the
+    recently completed Municipal Research.
+  identifier: '4180'
+  url_keyword: 'E639704180'
+  venue: mHUB Classroom
+  image: https://peoplevine.blob.core.windows.net/media/397/39788b2511a-6b6a-4bae-8074-8b07a4990214.png
+  start_time: !ruby/object:ActiveSupport::TimeWithZone
+    utc: 2017-07-11 19:00:00.000000000 Z
+    zone: &1 !ruby/object:ActiveSupport::TimeZone
+      name: America/Chicago
+    time: 2017-07-11 14:00:00.000000000 Z
+  end_time: !ruby/object:ActiveSupport::TimeWithZone
+    utc: 2017-07-11 20:30:00.000000000 Z
+    zone: *1
+    time: 2017-07-11 15:30:00.000000000 Z
+iot:
+  name: 'Intel® IoT Commercial Workshop at mHUB: Day 2'
+  description: |-
+    Intel® is holding a commercially focused, comprehensive, hands-on IoT workshop, and mHUB businesses and startups are invited! Those who work in hardware that are exploring the Internet of Things field will find this workshop extremely beneficial.
+    In this IoT workshop, developers will learn Intel’s IoT platform capabilities through targeted hands-on exercises. We will interact with Intel’s IoT edge and gateway devices, explore the spectrum of Intel’s software for programing, securing, managing and operating IoT infrastructure and understand Intel’s ongoing cloud partnerships with Amazon, IBM, GE, & Microsoft. Come experience the hands-on exercises that showcase Intel’s tools, and explore the partnerships and support you can start utilizing today!
+    The workshop is on Tues, June 27 - Wed, June 28 at mHUB Chicago. Registration details at iotevents.intel.com/Chicago2017/. Please email andy@bemyapp.com if you have any questions about the event.
+  summary: Intel® is holding a commercially focused, comprehensive, hands-on IoT workshop,
+    and mHUB businesses and startups are invited! Those who work in hardware that
+    are exploring the Internet of Things field will find this workshop extremely beneficial.
+  identifier: '4023'
+  url_keyword: 'E639704023'
+  venue: mHUB Event Space
+  image: https://peoplevine.blob.core.windows.net/media/397/3972ce8258b-942e-4434-8f8d-5904e7bb0610.png
+  start_time: !ruby/object:ActiveSupport::TimeWithZone
+    utc: 2017-06-28 14:00:00.000000000 Z
+    zone: *1
+    time: 2017-06-28 09:00:00.000000000 Z
+  end_time: !ruby/object:ActiveSupport::TimeWithZone
+    utc: 2017-06-28 22:00:00.000000000 Z
+    zone: *1
+    time: 2017-06-28 17:00:00.000000000 Z

@@ -21,6 +21,14 @@ class Event < ApplicationRecord
     write_attribute(:description, strip_html(string))
   end
 
+  def previous_changes_summary
+    text_builder.previous_changes_summary
+  end
+
+  def slack_summary
+    text_builder.summary
+  end
+
   # need to do these html replacements before storing open text from peoplevine
   # Replace the ampersand, &, with &amp;
   # Replace the less-than sign, < with &lt;
@@ -31,6 +39,10 @@ class Event < ApplicationRecord
   end
 
   private
+    def text_builder
+      @text_builder ||= EventTextBuilder.new(self)
+    end
+
     def timestamp_to_event_time_zone(timestamp)
       # Time interprets timestamps as being based in UTC
       #   eg: Time.zone.at(1498846695810) builds a local time assuming time '0' was in UTC
