@@ -3,12 +3,11 @@ require 'rails_helper'
 feature 'Updating a Slack channel with event information' do
   fixtures :events
   let(:channel)       { EventsChannel.new }
-  let(:slack_client)  { double("Slack::Web::Client") }
+  let(:slack_client)  { double("Slack::Web::Client", chat_postMessage: nil) }
   let(:event)         { Event.first }
 
   before do
     allow(channel).to receive(:slack_client) { slack_client }
-    allow(slack_client).to receive(:chat_postMessage)
   end
 
   context "updated event information" do
@@ -29,14 +28,25 @@ feature 'Updating a Slack channel with event information' do
   end
 
   context "printing the day's event digest" do
-    let(:event_day)   { Date.new(2017, 7, 11) }
+    let(:event_day)       { Date.new(2017, 7, 11) }
+
+    let(:heading_message) { "1 event today" }
+    let(:heading_params)  { hash_including(channel: '#event-feed', text: a_string_including(heading_message)) }
+
+    let(:event_message)   { "mHUB and New Mobility Lab" }
+    let(:event_params)    { hash_including(channel: '#event-feed', text: a_string_including(event_message)) }
+
+    let(:summary_message) { "2:00PM - 1.5 hours" }
+    let(:summary_params)  { hash_including(channel: '#event-feed', text: a_string_including(summary_message)) }
 
     before do
-      # EventsChannel.new.publish_events_digest(event_day)
+      channel.publish_events_digest(event_day)
     end
 
     it "should send information for today's events to Slack" do
-
+      expect(slack_client).to have_received(:chat_postMessage).with(heading_params)
+      expect(slack_client).to have_received(:chat_postMessage).with(event_params)
+      expect(slack_client).to have_received(:chat_postMessage).with(summary_params)
     end
   end
 end

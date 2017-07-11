@@ -1,5 +1,8 @@
 class EventTextBuilder
   include ActionView::Helpers::TextHelper
+  extend  ActionView::Helpers::TextHelper
+
+  TIME_FORMAT = "%-l:%M%p"
 
   attr_accessor :event
 
@@ -7,9 +10,22 @@ class EventTextBuilder
     @event = event
   end
 
-  def summary
-    # Event name, a link, start time, (location if not at mHUB), list the categories (finance, mfg, ECE, AI, ML, etc.)
-    #   the tagging of events should tie to a tag that slack users can sign up for
+  def self.date_heading(date, events)
+    heading = "*#{date.strftime("%B")} #{date.day.ordinalize}, #{date.year}* "
+    heading += "#{pluralize events.size, 'event'} today"
+    heading
+  end
+
+  # Event name, start time, (location if not at mHUB)
+  # *The Autonomous Vehicle Alliance Info Session* 2:00pm - 90 minutes
+  def summary(include_name: true)
+    detail_text = "#{event.start_time.strftime(TIME_FORMAT)} - #{duration_text}"
+
+    if include_name
+      "*#{name_text}* #{detail_text}"
+    else
+      detail_text
+    end
   end
 
   # eg:
@@ -18,7 +34,7 @@ class EventTextBuilder
     return unless event.previous_changes.slice(*change_attributes).present?
 
     if event.created
-      detail_text = summary
+      detail_text = summary(include_name: false)
     else
       detail_text = [important_changes_summary, copy_changes_summary].reject(&:blank?).join(" ")
     end
@@ -29,6 +45,17 @@ class EventTextBuilder
   private
     def name_text
       "<#{event.people_vine_url}|#{short_name}>"
+    end
+
+    def duration_text
+      duration_minutes = (event.end_time - event.start_time) / 60
+      duration_hours = duration_minutes / 60
+
+      if duration_hours < 1.0
+        pluralize(duration_minutes, "minute")
+      else
+        pluralize(duration_hours, "hour")
+      end
     end
 
     def change_attributes
@@ -74,7 +101,7 @@ class EventTextBuilder
       if event.previous_changes["start_time"].present?
         new_start = event.previous_changes["start_time"][1]
 
-        changes << "starts at *#{new_start.strftime("%-l:%M%p")}*" if new_start.present?
+        changes << "starts at *#{new_start.strftime(TIME_FORMAT)}*" if new_start.present?
 
         old_date = event.previous_changes["start_time"][0]
         old_date = old_date.to_date if old_date.present
@@ -88,7 +115,7 @@ class EventTextBuilder
       if event.previous_changes["end_time"].present?
         new_end = event.previous_changes["end_time"][1]
 
-        changes << "ends at *#{new_end.strftime("%-l:%M%p")}*" if new_end.present?
+        changes << "ends at *#{new_end.strftime(TIME_FORMAT)}*" if new_end.present?
       end
 
       return unless changes.present? || date_change_text.present?
