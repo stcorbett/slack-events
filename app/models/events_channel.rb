@@ -7,10 +7,38 @@ class EventsChannel
     @client ||= Slack::Web::Client.new
   end
 
-  def publish_events_digest(date=Date.today)
-    return unless events_for(date).present?
+  def bot_user_id
+    @bot_user_id ||= slack_client.auth_test[:user_id]
+  end
 
-    events = events_for(date)
+  def pinned_items
+    slack_client.pins_list(channel: configured_channel).items
+  end
+
+  def unpin_previously_pinned_messages
+    bot_messages = pinned_items.select do |message|
+      message.created_by == bot_user_id && message.type == "message"
+    end
+
+    bot_messages.each do |message|
+      slack_client.pins_remove(channel: configured_channel, timestamp: message.message.ts)
+    end
+  end
+
+  def pin_last_bot_message
+    messages = slack_client.channels_history(channel: configured_channel).messages
+    message_to_pin = messages.find do |message|
+      message.user == bot_user_id &&
+        message.type == "message" &&
+        message.subtype != "pinned_item"
+    end
+    return unless message_to_pin
+
+    slack_client.pins_add(channel: configured_channel, timestamp: message_to_pin.ts)
+  end
+
+  def publish_events_digest(date=Date.today)
+    events = events_for(date) || []
     slack_client.chat_postMessage({
       channel:      configured_channel,
       attachments:  events.map(&:slack_summary_attachment),
