@@ -2,7 +2,7 @@ class EventTextBuilder
   include ActionView::Helpers::TextHelper
   extend  ActionView::Helpers::TextHelper
 
-  TIME_FORMAT = "%-l:%M%p"
+  TIME_FORMAT = "%D %-l:%M%p"
 
   attr_accessor :event
 
@@ -13,18 +13,18 @@ class EventTextBuilder
   def self.date_heading(date, events)
     heading = "*#{date.strftime("%B")} #{date.day.ordinalize}, #{date.year}* "
     heading += "#{pluralize events.size, 'event'} today"
-    escape_html heading
+    heading
   end
 
   # Event name, start time, (location if not at mHUB)
   # *The Autonomous Vehicle Alliance Info Session* 2:00pm - 90 minutes
   def summary(include_name: true)
-    detail_text = "#{event.start_time.strftime(TIME_FORMAT)} - #{duration_text}"
+    detail_text = "#{slack_date_and_time(event.start_time)} - #{duration_text}"
 
     if include_name
-      escape_html "*#{name_text}* #{detail_text}"
+      "#{name_text} #{detail_text}"
     else
-      escape_html detail_text
+      detail_text
     end
   end
 
@@ -34,12 +34,14 @@ class EventTextBuilder
     return unless event.previous_changes.slice(*change_attributes).present?
 
     if event.created
-      detail_text = summary(include_name: false)
+      message = summary
+      message.prepend("*New event* ")
     else
       detail_text = [important_changes_summary, copy_changes_summary].reject(&:blank?).join(" ")
+      message = "#{name_text}: #{detail_text}"
     end
 
-    escape_html "#{name_text}: #{detail_text}"
+    message
   end
 
   def short_name
@@ -49,7 +51,7 @@ class EventTextBuilder
       event_name = event.name
     end
 
-    escape_html truncate(event_name.squish, length: 40, separator: /\W/)
+    truncate(event_name.squish, length: 60, separator: /\W/)
   end
 
   def duration_text
@@ -64,6 +66,10 @@ class EventTextBuilder
   end
 
   private
+    def slack_date_and_time(time)
+      "<!date^#{time.to_i}^{time} {date_short_pretty}|#{time.strftime(TIME_FORMAT)}>"
+    end
+
     def escape_html(message)
       escaped = message
       # negative lookahead to escape '&' unless it's part of an escaped html character
@@ -110,10 +116,10 @@ class EventTextBuilder
       if event.previous_changes["start_time"].present?
         new_start = event.previous_changes["start_time"][1]
 
-        changes << "starts at *#{new_start.strftime(TIME_FORMAT)}*" if new_start.present?
+        changes << "starts at *#{slack_date_and_time(new_start)}*" if new_start.present?
 
         old_date = event.previous_changes["start_time"][0]
-        old_date = old_date.to_date if old_date.present
+        old_date = old_date.to_date if old_date.present?
         new_date = event.previous_changes["start_time"][1].to_date
 
         if old_date != new_date
@@ -124,7 +130,7 @@ class EventTextBuilder
       if event.previous_changes["end_time"].present?
         new_end = event.previous_changes["end_time"][1]
 
-        changes << "ends at *#{new_end.strftime(TIME_FORMAT)}*" if new_end.present?
+        changes << "ends at *#{slack_date_and_time(new_end)}*" if new_end.present?
       end
 
       return unless changes.present? || date_change_text.present?

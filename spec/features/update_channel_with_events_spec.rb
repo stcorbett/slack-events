@@ -31,7 +31,7 @@ feature 'Updating a Slack channel with event information' do
     let(:event_day)       { Date.new(2017, 7, 11) }
 
     let(:heading_message) { "1 event today" }
-    let(:heading_params)  { event_params_hash({pretext: a_string_including(heading_message)}) }
+    let(:heading_params)  { hash_including({channel: '#event-feed', text: a_string_including(heading_message)}) }
 
     let(:event_message)   { "mHUB and New Mobility Lab" }
     let(:event_params)    { event_params_hash({title: a_string_including(event_message)}) }

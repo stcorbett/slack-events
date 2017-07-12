@@ -10,11 +10,12 @@ class EventsChannel
   def publish_events_digest(date=Date.today)
     return unless events_for(date).present?
 
-    attachments = attachments_for(date, events_for(date))
+    events = events_for(date)
     slack_client.chat_postMessage({
-      channel: configured_channel,
-      attachments: attachments,
-      as_user: true
+      channel:      configured_channel,
+      attachments:  events.map(&:slack_summary_attachment),
+      text:         EventTextBuilder.date_heading(date, events),
+      as_user:      true
     })
   end
 
@@ -25,32 +26,24 @@ class EventsChannel
       slack_client.chat_postMessage({
         channel: configured_channel,
         text: text,
-        as_user: true
+        as_user: true,
+        unfurl_links: false,
       })
     end
+  end
+
+  def publish_text(text)
+    slack_client.chat_postMessage({
+      channel: configured_channel,
+      text: text,
+      as_user: true
+    })
   end
 
   private
     def events_for(date)
       event_range = [date.to_time..(date.to_time + 1.day + 6.hours)]
       Event.where(start_time: event_range).order(start_time: :asc)
-    end
-
-    def messages_for(date, events)
-      messages = [EventTextBuilder.date_heading(date, events)]
-
-      events.each do |event|
-        messages << event.slack_summary
-      end
-
-      messages
-    end
-
-    def attachments_for(date, events)
-      attachments = events.map(&:slack_summary_attachment)
-      attachments.first[:pretext] = EventTextBuilder.date_heading(date, events)
-
-      attachments
     end
 
     def configured_channel

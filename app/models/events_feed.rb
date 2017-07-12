@@ -29,6 +29,7 @@ class EventsFeed
     def people_vine_parser(response_body)
       response_body.gsub!("<script>data=", "")
       response_body.gsub!(";</script><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>", "")
+      response_body.gsub!(/(<div><\/div>)*$/, "")
       JSON.parse response_body
     end
 
