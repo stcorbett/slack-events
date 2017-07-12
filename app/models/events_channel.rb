@@ -22,6 +22,7 @@ class EventsChannel
   def publish_event_changes(events)
     events.each do |event|
       text = event.previous_changes_summary
+      next unless text.present?
 
       slack_client.chat_postMessage({
         channel: configured_channel,
