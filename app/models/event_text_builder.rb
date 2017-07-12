@@ -11,8 +11,8 @@ class EventTextBuilder
   end
 
   def self.date_heading(date, events)
-    heading = "*#{date.strftime("%B")} #{date.day.ordinalize}, #{date.year}* "
-    heading += "#{pluralize events.size, 'event'} today"
+    heading = "#{date.strftime("%B")} #{date.day.ordinalize}, #{date.year} "
+    heading += "*#{pluralize events.size, 'Event'} Today*"
     heading
   end
 
@@ -66,8 +66,8 @@ class EventTextBuilder
   end
 
   private
-    def slack_date_and_time(time)
-      "<!date^#{time.to_i}^{time} {date_short_pretty}|#{time.strftime(TIME_FORMAT)}>"
+    def slack_date_and_time(date_time, date: true, time: true)
+      "<!date^#{date_time.to_i}^#{time ? '{time}' : ''} #{date ? '{date_short_pretty}' : ''}|#{date_time.strftime(TIME_FORMAT)}>"
     end
 
     def escape_html(message)
@@ -116,21 +116,21 @@ class EventTextBuilder
       if event.previous_changes["start_time"].present?
         new_start = event.previous_changes["start_time"][1]
 
-        changes << "starts at *#{slack_date_and_time(new_start)}*" if new_start.present?
+        changes << "starts at *#{slack_date_and_time(new_start, date: false)}*" if new_start.present?
 
         old_date = event.previous_changes["start_time"][0]
         old_date = old_date.to_date if old_date.present?
         new_date = event.previous_changes["start_time"][1].to_date
 
         if old_date != new_date
-          date_change_text = "on *#{new_date.strftime("%A, %B ") + new_date.day.ordinalize }*"
+          date_change_text = ", *#{ slack_date_and_time(event.start_time, time: false) }*"
         end
       end
 
       if event.previous_changes["end_time"].present?
         new_end = event.previous_changes["end_time"][1]
 
-        changes << "ends at *#{slack_date_and_time(new_end)}*" if new_end.present?
+        changes << "ends at *#{slack_date_and_time(new_end, date: false)}*" if new_end.present?
       end
 
       return unless changes.present? || date_change_text.present?
