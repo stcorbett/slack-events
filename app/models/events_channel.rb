@@ -25,16 +25,19 @@ class EventsChannel
     end
   end
 
-  def pin_last_bot_message
+  def last_bot_message
     messages = slack_client.channels_history(channel: configured_channel).messages
     message_to_pin = messages.find do |message|
       message.user == bot_user_id &&
         message.type == "message" &&
         message.subtype != "pinned_item"
     end
-    return unless message_to_pin
+  end
 
-    slack_client.pins_add(channel: configured_channel, timestamp: message_to_pin.ts)
+  def pin_last_bot_message
+    return unless message = last_bot_message
+
+    slack_client.pins_add(channel: configured_channel, timestamp: message.ts)
   end
 
   def publish_events_digest(date=Date.today)
