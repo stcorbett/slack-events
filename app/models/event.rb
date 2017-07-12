@@ -29,11 +29,6 @@ class Event < ApplicationRecord
     text_builder.summary
   end
 
-  # need to do these html replacements before storing open text from peoplevine
-  # Replace the ampersand, &, with &amp;
-  # Replace the less-than sign, < with &lt;
-  # Replace the greater-than sign, > with &gt;
-
   def people_vine_url
     "https://mhubchicago.com/event/#{url_keyword}"
   end
