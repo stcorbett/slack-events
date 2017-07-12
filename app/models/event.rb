@@ -29,6 +29,29 @@ class Event < ApplicationRecord
     text_builder.summary
   end
 
+  def slack_summary_attachment
+    {
+      title: text_builder.short_name,
+      title_link: people_vine_url,
+      text: description,
+      fields: [
+        {
+          title: "Start",
+          value: "<!date^#{start_time.to_i}^{time} {date_short_pretty}|#{start_time.strftime(EventTextBuilder::TIME_FORMAT)}>",
+          short: true,
+        },
+        {
+          title: "Duration",
+          value: text_builder.duration_text,
+          short: true
+        }
+      ],
+      image_url: image,
+      fallback: slack_summary,
+      color: "#c4b7a2"
+    }
+  end
+
   def people_vine_url
     "https://mhubchicago.com/event/#{url_keyword}"
   end

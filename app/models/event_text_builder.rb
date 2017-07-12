@@ -13,7 +13,7 @@ class EventTextBuilder
   def self.date_heading(date, events)
     heading = "*#{date.strftime("%B")} #{date.day.ordinalize}, #{date.year}* "
     heading += "#{pluralize events.size, 'event'} today"
-    heading
+    escape_html heading
   end
 
   # Event name, start time, (location if not at mHUB)
@@ -22,9 +22,9 @@ class EventTextBuilder
     detail_text = "#{event.start_time.strftime(TIME_FORMAT)} - #{duration_text}"
 
     if include_name
-      "*#{name_text}* #{detail_text}"
+      escape_html "*#{name_text}* #{detail_text}"
     else
-      detail_text
+      escape_html detail_text
     end
   end
 
@@ -39,23 +39,43 @@ class EventTextBuilder
       detail_text = [important_changes_summary, copy_changes_summary].reject(&:blank?).join(" ")
     end
 
-    "#{name_text}: #{detail_text}"
+    escape_html "#{name_text}: #{detail_text}"
+  end
+
+  def short_name
+    if event.previous_changes["name"] && event.previous_changes["name"][0].present?
+      event_name = event.previous_changes["name"][0]
+    else
+      event_name = event.name
+    end
+
+    escape_html truncate(event_name.squish, length: 40, separator: /\W/)
+  end
+
+  def duration_text
+    duration_minutes = (event.end_time - event.start_time) / 60
+    duration_hours = duration_minutes / 60
+
+    if duration_hours < 1.0
+      pluralize(duration_minutes, "minute")
+    else
+      pluralize(duration_hours, "hour")
+    end
   end
 
   private
-    def name_text
-      "<#{event.people_vine_url}|#{short_name}>"
+    def escape_html(message)
+      escaped = message
+      # negative lookahead to escape '&' unless it's part of an escaped html character
+      escaped.gsub!(/&(?!amp;|lt;|gt;)/, "&amp;")
+      escaped.gsub!("<", "&lt;")
+      escaped.gsub!(">", "&gt;")
+
+      escaped
     end
 
-    def duration_text
-      duration_minutes = (event.end_time - event.start_time) / 60
-      duration_hours = duration_minutes / 60
-
-      if duration_hours < 1.0
-        pluralize(duration_minutes, "minute")
-      else
-        pluralize(duration_hours, "hour")
-      end
+    def name_text
+      "<#{event.people_vine_url}|#{short_name}>"
     end
 
     def change_attributes
@@ -66,16 +86,7 @@ class EventTextBuilder
       ["name", "description", "summary", "image"]
     end
 
-    def short_name
-      if event.previous_changes["name"] && event.previous_changes["name"][0].present?
-        event_name = event.previous_changes["name"][0]
-      else
-        event_name = event.name
-      end
-
-      truncate(event_name.squish, length: 40, separator: /\W/)
-    end
-
+    # replicate as attachment objects where changes are shown as fields with titles and values
     def important_changes_summary
       important_changes = [venue_change_summary, time_changes_summary].reject(&:blank?)
       return unless important_changes.present?
@@ -95,8 +106,6 @@ class EventTextBuilder
     def time_changes_summary
       changes = []
       date_change_text = ""
-
-      # TODO: use slack time formatting (UTC epoch timestamps)
 
       if event.previous_changes["start_time"].present?
         new_start = event.previous_changes["start_time"][1]
