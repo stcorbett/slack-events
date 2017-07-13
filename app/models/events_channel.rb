@@ -74,7 +74,7 @@ class EventsChannel
 
   private
     def events_for(date)
-      event_range = [date.to_time..(date.to_time + 1.day + 6.hours)]
+      event_range = [date.in_time_zone..(date.in_time_zone + 1.day + 6.hours)]
       Event.where(start_time: event_range).order(start_time: :asc)
     end
 
