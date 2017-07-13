@@ -93,7 +93,7 @@ class EventsChannel
     end
 
     def configured_channel
-      channel_name = ENV.fetch("EVENTS_CHANNEL") { "event-feed" }
+      channel_name = (ENV.fetch("EVENTS_CHANNEL") { "event-feed" }).dup
       channel_name.gsub!(/^#/, "")
       channel_name.prepend("#")
 
