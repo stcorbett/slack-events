@@ -34,6 +34,20 @@ class EventsChannel
     end
   end
 
+  def remove_message(message_or_ts)
+    case message_or_ts
+    when Slack::Messages::Message
+      ts = message_or_ts.ts
+    when String
+      ts = message_or_ts
+    else
+      ts = nil
+    end
+    raise "can't find message from input" unless ts.present? && ts.to_f > 0.0
+
+    slack_client.chat_delete(channel: configured_channel, ts: ts)
+  end
+
   def pin_last_bot_message
     return unless message = last_bot_message
 
