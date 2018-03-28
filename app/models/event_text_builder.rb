@@ -85,7 +85,7 @@ class EventTextBuilder
     end
 
     def change_attributes
-      copy_change_attributes + ["venue", "start_time", "end_time"]
+      ["venue", "start_time", "end_time"]
     end
 
     def copy_change_attributes

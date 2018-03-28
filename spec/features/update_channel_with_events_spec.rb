@@ -11,12 +11,12 @@ feature 'Updating a Slack channel with event information' do
   end
 
   context "updated event information" do
-    let(:new_name)        { "Bigger Better Event Name" }
-    let(:edit_message)    { "Name was edited" }
+    let(:new_venue)       { "Bigger Better Venue" }
+    let(:edit_message)    { "Venue changed to" }
     let(:expected_params) { hash_including(channel: '#event-feed', text: a_string_including(edit_message)) }
 
     before do
-      event.name = new_name
+      event.venue = new_venue
       event.save!
 
       channel.publish_event_changes([event])
