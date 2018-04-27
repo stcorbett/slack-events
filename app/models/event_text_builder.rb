@@ -36,6 +36,9 @@ class EventTextBuilder
     if event.created
       message = summary
       message.prepend("*New event* ")
+    elsif event.deleted_at.present?
+      message = summary
+      message.prepend("*Canceled Event* ")
     else
       detail_text = [important_changes_summary, copy_changes_summary].reject(&:blank?).join(" ")
       message = "#{name_text}: #{detail_text}"
@@ -85,7 +88,7 @@ class EventTextBuilder
     end
 
     def change_attributes
-      ["venue", "start_time", "end_time"]
+      ["venue", "start_time", "end_time", "deleted_at"]
     end
 
     def copy_change_attributes

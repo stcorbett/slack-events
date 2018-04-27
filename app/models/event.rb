@@ -4,6 +4,8 @@ class Event < ApplicationRecord
   store :feed_response,  coder: JSON
   after_create :set_created_instance_variable
 
+  scope :active, -> { where(deleted_at: nil) }
+
   def self.event_time_zone
     ENV.fetch("EVENT_TIME_ZONE") { 'Central Time (US & Canada)' }
   end

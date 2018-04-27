@@ -21,6 +21,21 @@ class EventsFeed
     saved_events
   end
 
+  def remove_canceled_events!
+    active_events = events_from_feed.pluck(:identifier)
+    canceled_events = []
+
+    possibly_deleted_events.each do |event|
+      unless active_events.include?(event.identifier)
+        event.deleted_at = Time.now.in_time_zone
+        event.save!
+        canceled_events << event
+      end
+    end
+
+    canceled_events
+  end
+
   private
     def feed_response
       @feed_response ||= Faraday.get ENV.fetch("EVENTS_URL") { "http://mhubchicago.com/pageh/22890/event-stream.js" }
@@ -57,4 +72,8 @@ class EventsFeed
       end
     end
 
+    def possibly_deleted_events
+      event_range = [(Date.today.in_time_zone + 2.days)..(Date.today.in_time_zone + 3.days)]
+      Event.active.where(start_time: event_range)
+    end
 end
